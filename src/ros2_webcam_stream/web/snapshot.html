@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ROS2 Webcam Stream - Snapshot</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+        .container { max-width: 800px; margin: 0 auto; }
+        img { max-width: 100%; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Latest Frame from Camera</h1>
+        <img id="snapshot" src="/snapshot" alt="Latest frame">
+        <div>
+            <button id="refresh">Refresh Image</button>
+            <button onclick="window.location='/'">Try WebRTC Mode</button>
+            <button onclick="window.location='/fallback'">Try MJPEG Mode</button>
+        </div>
+        <p>Current time: <span id="time"></span></p>
+    </div>
+
+    <script>
+        // Update time
+        function updateTime() {
+            document.getElementById('time').textContent = new Date().toLocaleTimeString();
+        }
+        
+        // Refresh snapshot
+        document.getElementById('refresh').addEventListener('click', function() {
+            const img = document.getElementById('snapshot');
+            img.src = '/snapshot?' + new Date().getTime();  // Add cache-busting parameter
+            updateTime();
+        });
+        
+        // Update initially
+        updateTime();
+        
+        // Auto-refresh every 2 seconds
+        setInterval(function() {
+            document.getElementById('refresh').click();
+        }, 2000);
+    </script>
+</body>
+</html> 

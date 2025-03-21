@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ROS2 Webcam Stream - Fallback</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; }
+        .stream-container { margin-top: 20px; }
+        img { width: 100%; max-width: 800px; border: 1px solid #ddd; }
+        .controls { margin-top: 20px; }
+        button { padding: 8px 16px; margin-right: 10px; }
+        .status { margin-top: 15px; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ROS2 Webcam Stream - Fallback Mode</h1>
+        
+        <div class="stream-container">
+            <h2>MJPEG Stream (No WebRTC)</h2>
+            <img id="mjpeg-stream" src="/mjpeg" alt="MJPEG Stream">
+        </div>
+        
+        <div class="stream-container">
+            <h2>Latest Frame Snapshot</h2>
+            <img id="snapshot" src="/snapshot" alt="Latest Frame">
+            <div class="controls">
+                <button id="refresh-snapshot">Refresh Snapshot</button>
+                <span id="snapshot-time"></span>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="window.location.href='/'">Return to WebRTC Mode</button>
+        </div>
+        
+        <div class="status" id="status">Fallback mode active - using HTTP instead of WebRTC</div>
+        
+        <div class="debug-tools">
+            <h3>Debug Tools</h3>
+            <button onclick="testWebRTC()">Test WebRTC Camera</button>
+            <video id="test-video" autoplay playsinline muted style="width: 200px; height: 150px; background: #000; display: none;"></video>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('refresh-snapshot').addEventListener('click', function() {
+            const img = document.getElementById('snapshot');
+            const time = document.getElementById('snapshot-time');
+            img.src = '/snapshot?' + new Date().getTime(); // Add cache-busting
+            time.textContent = 'Updated: ' + new Date().toLocaleTimeString();
+        });
+        
+        // Auto-refresh the snapshot every 5 seconds
+        setInterval(() => {
+            document.getElementById('refresh-snapshot').click();
+        }, 5000);
+
+        function testWebRTC() {
+            const video = document.getElementById('test-video');
+            video.style.display = 'block';
+            
+            navigator.mediaDevices.getUserMedia({video: true})
+                .then(stream => {
+                    video.srcObject = stream;
+                    alert("Your browser supports WebRTC camera access!");
+                })
+                .catch(err => {
+                    alert("WebRTC Camera test failed: " + err.message);
+                });
+        }
+    </script>
+</body>
+</html> 
